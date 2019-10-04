@@ -1,5 +1,5 @@
 # fugkyeehaw
-
+```
 BNF:
 <program> -> <stmts>
 <stmts> -> <stmt> | <stmt> <stmts>
@@ -29,3 +29,4 @@ EBNF:
 <bool_expr> -> <expr> : <expr>
 <val> -> %identifier% | %numeric_literal% | %string_literal%
 
+```
