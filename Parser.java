@@ -1,24 +1,36 @@
-
-
+//tenny merged the parser and driver
 public class Parser {
-	public void match(String currentToken)
+	Token current; //holds current
+	Lexer lexer; //holds our lexer
+	
+	public Parser(String filename)
 	{
 		try
 		{
-			
+			lexer = new Lexer(new File(filename));
+			current = lexer.lex();
 		}
 		catch(Exception e)
 		{
-			System.out.println(currentToken + " does not match a valid statement");
-		}
-		finally
-		{
-		//kill program
+			System.out.println("Cannot open input file.");
+			System.exit(0);
 		}
 	}
 	public void program() 
 	{
 		System.out.println("Begin <program>");
+		//try
+		//{
+		//	
+		//}
+		//catch(Exception e)
+		//{
+		//	System.out.println(currentToken + " does not match a valid statement");
+		//}
+		//finally
+		//{
+		//kill program
+		//}
 	} 
 	public void stmts()
 	{
@@ -62,5 +74,9 @@ public class Parser {
 	{
 		
 	} 
-
+	public static void main(String[] args) {
+		Parser parser = new Parser(args[0]);
+		parser.program();
+		//we gonna have to make sure the lexer works right 
+	}
 }
