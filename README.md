@@ -22,7 +22,7 @@ EBNF:
 <print_stmt>
 <decl_stmt> -> (num|string) %identifier%
 <ass_stmt> -> %identifier% = <expr>
-<loop_stmt> -> repeat (<expr> | <bool_expr>) \( <stmts> \)
+<loop_stmt> -> repeat <expr> [: <expr>] \( <stmts> \)
 <if_stmt> -> if <bool_expr> \( <stmts> \)
 <print_stmt> -> show \( <expr> \)
 <expr> -> <val> { + <val>}
