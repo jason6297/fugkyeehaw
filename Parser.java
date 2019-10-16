@@ -32,10 +32,31 @@ public class Parser {
 		//kill program
 		//}
 	} 
-	public void stmts()
+	public void match(String token)
 	{
+		if(token.equals(next)) {
+			System.out.println("Matched " + token.getDescription());
+			//if(scanner.hasNext())
+			//	next = scanner.next();
+			//else
+			//	System.exit(0);
+			try {
+				lexer.getLexeme();
+			}
+			catch (Exception e) {
+				System.out.println("End of file reached [error in match()]");
+				System.exit(0);
+			}
+		}
+		else {
+		System.out.println("ERROR"); //change this to be more descriptive
+		System.exit(0);
+		}
+	}
+	public void stmts()
+	{		
 		System.out.println("Begin <stmts>");
-		//check if there is at least one statement
+		match(.);
 	} 
 	public void stmt()
 	{
@@ -44,7 +65,8 @@ public class Parser {
 	} 
 	public void decl_stmt()
 	{
-		
+		System.out.println("Begin <decl_stmt>");
+		match("");
 	} 
 	public void ass_stmt()
 	{
@@ -68,7 +90,7 @@ public class Parser {
 	} 
 	public void bool_expr()
 	{
-		
+		System.out.println("Begin <bool_expr>");		
 	} 
 	public void val()
 	{
