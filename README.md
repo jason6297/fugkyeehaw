@@ -28,5 +28,4 @@ EBNF:
 <expr> -> <val> { + <val>}
 <bool_expr> -> <expr> : <expr>
 <val> -> %identifier% | %numeric_literal% | %string_literal%
-
 ```
