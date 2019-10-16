@@ -1,5 +1,10 @@
+//original code derived from
 //CSC 415 Assignment 4
 //Matthew Tennyson
+// ===
+//Jason Peavy & Hannah Saffel
+//CSC 415 Assignment 5
+//PIFL language lex & parse
 
 public class Token
 {
