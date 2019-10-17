@@ -20,54 +20,72 @@ public class Parser
 		catch(Exception e)
 		{
 			System.out.println("Cannot open input file.");
-			System.exit(0);
 		}
+		System.exit(0);
 	}
-	public void program() 
-	{
-		System.out.println("Begin <program>");
-		stmts();
-	} 
-	public void match(Token token)
+	
+	public void match(Token token) throws Exception
 	{
 		if(token.equals(current)) 
 		{
 			System.out.println("Matched " + token.getDescription());
-			try
-			{
-				current = lexer.lex();
-			}
-			catch (Exception e) //end of file 
-			//TODO: make sure reached end of file successfully (not expecting more tokens)
-			{
-				System.out.println("End of file reached [error in match()]");
-				System.exit(0);
-			}
+			current = lexer.lex();
 		}
-		else 
+		else if (token.equals(null))
 		{
-		System.out.println("ERROR"); 
-		//TODO: change this to be more descriptive
-		System.exit(0);
+			System.out.println("Token returned null"); 
+			System.exit(0);
+		}
+		else
+		{
+			throw new Exception();
 		}
 	}
-	public void stmts() //<stmts> -> <stmt> {<stmt>}
-	{	
+	
+	public void program() 
+	{
 		try
 		{
-			System.out.println("Begin <stmts>");
-			//TODO: make sure this is actually valid lol
-			stmt();
+			System.out.println("Begin <program>");
+			stmts();
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			System.out.println("incorrext statements syntax: \"  " + current.getLexeme() + "\"");
-			e.printStackTrace();
+			System.out.println("End of file reached");
+			System.exit(0);
 		}
 	} 
-	public void stmt() //<stmt> -> <decl_stmt> | <ass_stmt> | <loop_stmt> | <if_stmt> 
+	
+	public void stmts() //<stmts> -> <stmt> {<stmt>}
+	{	
+		System.out.println("Begin <stmts>");
+		stmt();
+		while (current.getDescription().equals("num keyword")
+				|| current.getDescription().equals("string keyword")
+				|| current.getDescription().equals("repeat keyword")
+				|| current.getDescription().equals("if keyword")
+				|| current.getDescription().equals("show keyword")
+				|| current.getDescription().equals("identifier"))
+		{
+			stmt();
+		}
+		//cannot handle nested statements
+//		if (current.equals(null))
+//		{
+//			System.out.println("End of file reached");
+//			System.exit(0);
+//		}
+//		else
+//		{
+//			System.out.println("invalid syntax: '" + current.getLexeme() + "'" + ", expected a statement");
+//		}
+			
+	} 
+	
+	public void stmt() //<stmt> -> <decl_stmt> | <ass_stmt> | <loop_stmt> | <if_stmt> | <print_stmt>
 	{
-		try {
+		try 
+		{
 			System.out.println("Begin <stmt>");
 			switch(current.getDescription()) 
 			{
@@ -95,55 +113,149 @@ public class Parser
 		}
 		catch (Exception e)
 		{
-			System.out.println("incorrext statement syntax: \" " + current.getLexeme() + "\"");
-			e.printStackTrace();
+			System.out.println("incorrext statement syntax: '" + current.getLexeme() + "'" + ", expected a statement");
+			System.exit(0);
 		}
 	} 
 	
 	public void decl_stmt() //<decl_stmt> -> (num|string) %identifier%
 	{
-		System.out.println("Begin <decl_stmt>");
-		match(new Token(current.getLexeme(), "<decl_stmt>"));
+		try 
+		{
+			System.out.println("Begin <decl_stmt>");
+			switch(current.getDescription()) 
+			{
+				case "num keyword":
+					match(new Token(current.getLexeme(), "num keyword"));
+					break;
+				case "string keyword":
+					match(new Token(current.getLexeme(), "string keyword"));
+					break;
+				default:
+					throw new Exception();
+			}
+			match(new Token(current.getLexeme(), "identifier"));
+		}
+		catch (Exception e)
+		{
+			System.out.println("incorrext declaration syntax: '" + current.getLexeme() + "'" + ", expected an identifier");
+			System.exit(0);
+		}
 	} 
 	
 	public void ass_stmt() //<ass_stmt> -> %identifier% = <expr>
 	{
+		try {
 		System.out.println("Begin <ass_stmt>");
 		match(new Token(current.getLexeme(), "identifier"));
+		match(new Token(current.getLexeme(), "assignment"));
+		expr();
+		}
+		catch(Exception e)
+		{
+			System.out.println("incorrext assignment syntax: '" + current.getLexeme() + "'" + ", expected '='");
+			System.exit(0);
+		}
 	} 
 	
-	public void loop_stmt() throws Exception //<loop_stmt> -> repeat (<expr> | <bool_expr>) \( <stmts> \)
+	public void loop_stmt()//<loop_stmt> -> repeat (<expr> | <bool_expr>) \( <stmts> \)
 	{
-		System.out.println("Begin <loop_stmt>");
-		match(new Token(current.getLexeme(), "repeat keyword"));
-		expr();
-		match(new Token(current.getLexeme(), "open parenthesis"));
-		stmts();
-		match(new Token(current.getLexeme(), "close parenthesis"));
+		try {
+			System.out.println("Begin <loop_stmt>");
+			match(new Token(current.getLexeme(), "repeat keyword"));
+			expr();
+			if (current.getDescription().equals("is equal to"))
+			{
+				match(new Token(current.getLexeme(), "is equal to"));
+				expr();
+			}
+			match(new Token(current.getLexeme(), "open parenthesis"));
+			stmts();
+			match(new Token(current.getLexeme(), "close parenthesis"));
+		}
+		catch(Exception e)
+		{
+			System.out.println("incorrext loop syntax: '" + current.getLexeme() + "'" + ", expected 'boolean operator or (statement)'");
+			System.exit(0);
+		}
 	} 
 	
 	public void if_stmt() //<if_stmt> -> if <bool_expr> \( <stmts> \)
 	{
-		System.out.println("Begin <if_stmt>");
-		bool_expr();
-		match(new Token(current.getLexeme(), "open parenthesis"));
-		stmts();
-		match(new Token(current.getLexeme(), "close parenthesis"));
+		try {
+			System.out.println("Begin <if_stmt>");
+			match(new Token(current.getLexeme(), "if keyword"));
+			bool_expr();
+			match(new Token(current.getLexeme(), "open parenthesis"));
+			stmts();
+			match(new Token(current.getLexeme(), "close parenthesis"));
+		}
+		catch(Exception e)
+		{
+			System.out.println("incorrext if statement syntax: '" + current.getLexeme() + "'" + ", expected parenthesis around expression");
+			System.exit(0);
+		}
 	} 
 	
 	public void print_stmt() //<print_stmt> -> show \( <expr> \)
 	{
-		System.out.println("Begin <print_stmt>");
-		match(new Token(current.getLexeme(), "show keyword"));
-		match(new Token(current.getLexeme(), "open parenthesis"));
-		expr();
-		match(new Token(current.getLexeme(), "close parenthesis"));
-	} 
+		try {
+			System.out.println("Begin <print_stmt>");
+			match(new Token(current.getLexeme(), "show keyword"));
+			match(new Token(current.getLexeme(), "open parenthesis"));
+			expr();
+			match(new Token(current.getLexeme(), "close parenthesis"));
+		}
+		catch(Exception e)
+		{
+			System.out.println("incorrext print statement syntax: '" + current.getLexeme() + "'" + ", expected an expression");
+			System.exit(0);
+		}
+	}
 	
 	public void expr() //<expr> -> <val> { + <val>}
 	{
 		try {
 			System.out.println("Begin <expr>");
+			if(current.getDescription().equals("string literal") 
+					|| current.getDescription().equals("numeric literal")
+					|| current.getDescription().equals("identifier"))
+			{
+				val();
+				while(current.getDescription().equals("add/concatenate"))
+				{
+					match(new Token(current.getLexeme(), "add/concatenate"));
+					val();
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("incorrext if statement syntax: '" + current.getLexeme() + "'" + ", expected '+'");
+			System.exit(0);
+		}
+	} 
+	
+	public void bool_expr() //<bool_expr> -> <expr> : <expr>
+	{
+		try {
+			System.out.println("Begin <bool_expr>");
+			expr();
+			match(new Token(current.getLexeme(), "is equal to"));
+			expr();
+		}
+		catch(Exception e)
+		{
+			System.out.println("incorrext if statement syntax: '" + current.getLexeme() + "'" + ", expected ':'");
+			System.exit(0);
+		}
+	} 
+	
+	public void val() //<val> -> %identifier% | %numeric_literal% | %string_literal%
+	{
+		try 
+		{
+			System.out.println("Begin <val>");
 			switch(current.getDescription()) 
 			{
 				case "string literal":
@@ -152,33 +264,17 @@ public class Parser
 				case "numeric literal":
 					match(new Token(current.getLexeme(), "numeric literal"));
 					break;
+				case "identifier":
+					match(new Token(current.getLexeme(), "identifier"));
+					break;
 				default:
 					throw new Exception();
 			}
 		}
-		catch (Exception e) {
-			System.out.println("incorrext expression syntax: \" " + current.getLexeme() + "\"");
-			e.printStackTrace();
+		catch (Exception e) 
+		{
+			System.out.println("incorrext expression syntax: '" + current.getLexeme() + "'" + ", expected an identifier or literal value");
+			System.exit(0);
 		}
 	} 
-	
-	public void bool_expr() //<bool_expr> -> <expr> : <expr>
-	{
-		System.out.println("Begin <bool_expr>");
-		expr();
-		match(new Token(current.getLexeme(), "is equal to"));
-		expr();
-	} 
-	
-	public void val() //<val> -> %identifier% | %numeric_literal% | %string_literal%
-	{
-		System.out.println("Begin <val>");
-		match(new Token(current.getLexeme(), "<val>"));
-	} 
-//	public static void main(String[] args) 
-//	{
-//		Parser parser = new Parser(args[0]);
-//		parser.program();
-//		//TODO: make sure the lexer works right 
-//	}
 }
