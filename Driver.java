@@ -1,8 +1,8 @@
-import java.util.Scanner;
-
 //Jason Peavy & Hannah Saffel
 //CSC 415 Assignment 5
 //PIFL language lex & parse
+import java.util.Scanner;
+
 public class Driver 
 {
 	public static void main(String[] args) 
