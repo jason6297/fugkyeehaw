@@ -66,20 +66,7 @@ public class Lexer
                 if(matcher.group(TOKENS[i][0])!=null)
                     return new Token(lexeme, TOKENS[i][2]);
         }
-        System.out.println("no token returned");
+        System.out.println("No token returned");
         return null;
     }
-
-//    public String Lexit()
-//    {
-//        Token current = lex();
-//        StringBuilder sb = new StringBuilder();
-//        int count=0;
-//        while(current!=null)
-//        {
-//            sb.append((++count) + ".\t" + current);
-//            current = lex();
-//        }
-//        return sb.toString();
-//    }
 }
